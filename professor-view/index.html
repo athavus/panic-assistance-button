@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Botão de Pânico - IFPB</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #0f0f0f;
+      color: #d4d4d8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      padding: 2.5rem;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      color: #fafafa;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    label {
+      font-weight: 500;
+      color: #a1a1aa;
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #27272a;
+      background-color: #0f0f0f;
+      color: #d4d4d8;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #3f3f46;
+    }
+
+    button {
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      padding: 0.75rem 1.25rem;
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #18181b;
+      color: #d4d4d8;
+    }
+
+    button:hover {
+      background: #27272a;
+      border-color: #3f3f46;
+    }
+
+    .btn-primary {
+      background: #18181b;
+      border-color: #3f3f46;
+      color: #fafafa;
+    }
+
+    .btn-primary:hover {
+      background: #27272a;
+      border-color: #52525b;
+    }
+
+    .btn-help {
+      background: #c6ba14;
+      border-color: #ccbf0c;
+      color: #ffffff;
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+
+    .btn-help:hover {
+      background: #c6ba14e0;
+      border-color: #ccbf0c;
+    }
+
+    .btn-accident {
+      background: #dc2626;
+      border-color: #ef4444;
+      color: #ffffff;
+      flex: 1;
+      margin-left: 0.5rem;
+    }
+
+    .btn-accident:hover {
+      background: #b91c1c;
+      border-color: #dc2626;
+    }
+
+    .back-btn {
+      background: #18181b;
+      border-color: #27272a;
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+
+    .back-btn:hover {
+      background: #27272a;
+      border-color: #3f3f46;
+    }
+
+    .panic-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .info-panel {
+      background-color: #0f0f0f;
+      border: 1px solid #27272a;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0 1.5rem 0;
+      color: #a1a1aa;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid;
+      margin: 1.5rem 0;
+      font-weight: 500;
+      max-width: 500px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .alert-success {
+      background-color: #059669;
+      color: #ffffff;
+      border-color: #10b981;
+    }
+
+    .alert-error {
+      background-color: #dc2626;
+      color: #ffffff;
+      border-color: #ef4444;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fafafa;
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      margin: 1rem 0;
+      color: #a1a1aa;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .panic-buttons {
+        flex-direction: column;
+      }
+
+      .btn-help,
+      .btn-accident {
+        margin: 0 0 0.5rem 0 !important;
+      }
+
+      .btn-accident {
+        margin-bottom: 0 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="logo">IFPB - Botão de Pânico</h1>
+
+    <div class="step active" id="step1">
+      <h2>Login do Professor</h2>
+      <div class="form-group">
+        <label for="matricula">Matrícula:</label>
+        <input type="text" id="matricula" placeholder="Digite sua matrícula" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="off" />
+      </div>
+      <button class="btn btn-primary" onclick="loginProfessor()">Entrar</button>
+    </div>
+
+
+    <div class="step" id="step2">
+      <h2>Selecione a Sala</h2>
+      <div class="info-panel">
+        <strong>Professor:</strong> <span id="professorNome"></span>
+      </div>
+      <div class="form-group">
+        <label for="salaSelect">Sala:</label>
+        <select id="salaSelect">
+          <option value="">Carregando salas...</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="selecionarSala()">Confirmar Sala</button>
+      <button class="btn back-btn" onclick="voltarPasso(1)">Voltar</button>
+    </div>
+
+    <div class="step" id="step3">
+      <h2>Sistema de Alerta</h2>
+      <div class="info-panel">
+        <strong>Professor:</strong> <span id="professorNome2"></span><br />
+        <strong>Sala:</strong> <span id="salaNome"></span>
+      </div>
+
+      <p>
+        Pressione um dos botões abaixo em caso de necessidade:
+      </p>
+
+      <div class="panic-buttons">
+        <button class="btn btn-help" onclick="enviarAlerta('AJUDA')">
+          Pedido de Ajuda
+        </button>
+        <button class="btn btn-accident" onclick="enviarAlerta('ACIDENTE')">
+          Alerta de Acidente
+        </button>
+      </div>
+
+      <button class="btn back-btn" onclick="voltarPasso(2)">Trocar Sala</button>
+    </div>
+
+    <div id="alertContainer"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:8080/api';
+    let professorAtual = null;
+    let salaAtual = null;
+
+    function mostrarAlerta(message, type = 'success') {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+
+      setTimeout(() => {
+        alert.style.opacity = '0';
+        alert.style.transition = 'opacity 0.2s ease';
+        setTimeout(() => {
+          if (container.contains(alert)) {
+            container.removeChild(alert);
+          }
+        }, 200);
+      }, 4000);
+    }
+
+    function mostrarPasso(passo) {
+      document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+      });
+      document.getElementById(`step${passo}`).classList.add('active');
+    }
+
+    function voltarPasso(passo) {
+      mostrarPasso(passo);
+    }
+
+    async function loginProfessor() {
+      const matricula = document.getElementById('matricula').value.trim();
+      const senha = document.getElementById('senha').value;
+
+      if (!matricula || !senha) {
+        mostrarAlerta('Por favor, preencha matrícula e senha', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/professores/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ matricula, senha }),
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Professor não encontrado');
+          } else if (response.status === 401 || response.status === 400) {
+            throw new Error('Matrícula ou senha incorretos');
+          } else {
+            throw new Error('Erro no login');
+          }
+        }
+
+        professorAtual = await response.json();
+        document.getElementById('professorNome').textContent = professorAtual.nome;
+        await carregarSalas();
+        mostrarPasso(2);
+      } catch (err) {
+        mostrarAlerta('Erro: ' + err.message, 'error');
+      }
+    }
+
+
+    async function carregarSalas() {
+      try {
+        const response = await fetch(`${API_BASE}/salas`);
+        const salas = await response.json();
+        const select = document.getElementById('salaSelect');
+        select.innerHTML = '<option value="">Selecione uma sala</option>';
+        salas.forEach(sala => {
+          const option = document.createElement('option');
+          option.value = sala.id;
+          option.textContent = `${sala.nome} - Bloco ${sala.bloco}`;
+          option.dataset.nome = sala.nome;
+          option.dataset.bloco = sala.bloco;
+          select.appendChild(option);
+        });
+      } catch (err) {
+        mostrarAlerta('Erro ao carregar salas: ' + err.message, 'error');
+      }
+    }
+
+    function selecionarSala() {
+      const select = document.getElementById('salaSelect');
+      const salaId = select.value;
+      if (!salaId) {
+        mostrarAlerta('Por favor, selecione uma sala', 'error');
+        return;
+      }
+      const selectedOption = select.options[select.selectedIndex];
+      salaAtual = {
+        id: salaId,
+        nome: selectedOption.dataset.nome,
+        bloco: selectedOption.dataset.bloco
+      };
+      document.getElementById('professorNome2').textContent = professorAtual.nome;
+      document.getElementById('salaNome').textContent = `${salaAtual.nome} - Bloco ${salaAtual.bloco}`;
+      mostrarPasso(3);
+    }
+
+    async function enviarAlerta(tipo) {
+      if (!professorAtual || !salaAtual) {
+        mostrarAlerta('Erro: Dados incompletos', 'error');
+        return;
+      }
+      try {
+        const response = await fetch(`${API_BASE}/alertas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            salaId: parseInt(salaAtual.id),
+            professorId: professorAtual.id,
+            tipo: tipo
+          })
+        });
+        if (!response.ok) throw new Error('Erro ao enviar alerta');
+        const alerta = await response.json();
+        const tipoTexto = tipo === 'AJUDA' ? 'Pedido de Ajuda' : 'Alerta de Acidente';
+        mostrarAlerta(`${tipoTexto} enviado com sucesso! ID: ${alerta.id}`, 'success');
+      } catch (err) {
+        mostrarAlerta('Erro ao enviar alerta: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('matricula').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') loginProfessor();
+      });
+    });
+  </script>
+</body>
+
+</html>
