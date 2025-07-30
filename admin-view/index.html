@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Botão de Pânico IFPB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f0f0f;
+            color: #d4d4d8;
+            min-height: 100vh;
+            padding: 1rem;
+            line-height: 1.5;
+        }
+        .header {
+            background: #18181b;
+            color: #fafafa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #27272a;
+            margin-bottom: 1.5rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 1.5rem;
+        }
+        .header h1 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+            color: #fafafa;
+        }
+        .header p {
+            color: #a1a1aa;
+            font-size: 0.875rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
+        }
+        .chart-column {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 100%;
+        }
+        .forms-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 300px;
+            height: 100%;
+        }
+        .chart-column .card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .forms-column .card {
+            flex: 1;
+        }
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .chart-column,
+            .forms-column {
+                width: 100%;
+            }
+        }
+        
+        /* Estilos do gráfico */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin: 1rem 0;
+        }
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        .chart-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #27272a;
+            font-size: 0.875rem;
+        }
+        .chart-stat {
+            text-align: center;
+        }
+        .chart-stat-number {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .chart-stat-ajuda {
+            color: #34d399;
+        }
+        .chart-stat-acidente {
+            color: #f87171;
+        }
+
+        .card {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: #d4d4d8;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card h2 {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: #fafafa;
+        }
+        .card h3 {
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: #fafafa;
+        }
+
+        #history-section {
+            margin-top: 1.5rem;
+        }
+
+        /* Seção de Estatísticas */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #27272a;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #fafafa;
+        }
+        .stat-total {
+            color: #a1a1aa;
+        }
+        .stat-ajuda {
+            color: #34d399;
+        }
+        .stat-acidente {
+            color: #f87171;
+        }
+
+        /* Alertas por Bloco */
+        .alertas-bloco {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #27272a;
+        }
+        .alertas-bloco-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .alertas-bloco-table th {
+            text-align: left;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #27272a;
+            font-weight: 500;
+            color: #a1a1aa;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .alertas-bloco-table th:last-child {
+            text-align: right;
+        }
+        .alertas-bloco-table td {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #27272a;
+            color: #d4d4d8;
+        }
+        .alertas-bloco-table td:last-child {
+            text-align: right;
+            font-weight: 500;
+        }
+        .alertas-bloco-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Último Alerta */
+        .ultimo-alerta {
+            font-size: 0.875rem;
+            color: #d4d4d8;
+            padding: 0.75rem;
+            background: #0f0f0f;
+            border: 1px solid #27272a;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+        }
+
+        /* Gráfico de barras por bloco */
+        .bar-chart {
+            height: 180px;
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            padding: 1rem 0;
+            border-bottom: 1px solid #27272a;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+        .bar {
+            width: 30px;
+            background: linear-gradient(to top, #3b82f6, #60a5fa);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            min-height: 3px;
+        }
+        .bar:hover {
+            background: linear-gradient(to top, #2563eb, #3b82f6);
+        }
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #a1a1aa;
+            font-weight: 500;
+        }
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #fafafa;
+            font-weight: 600;
+        }
+
+        button {
+            border: 1px solid #27272a;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+            background: #18181b;
+            color: #d4d4d8;
+        }
+        button:hover {
+            background: #27272a;
+            border-color: #3f3f46;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .btn-primary {
+            background: #18181b;
+            border-color: #3f3f46;
+            color: #fafafa;
+        }
+        .btn-primary:hover {
+            background: #27272a;
+            border-color: #52525b;
+        }
+        .btn-success {
+            background: #059669;
+            border-color: #10b981;
+            color: #ffffff;
+        }
+        .btn-success:hover {
+            background: #047857;
+            border-color: #059669;
+        }
+        .btn-danger {
+            background: #dc2626;
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #dc2626;
+        }
+        .btn-warning {
+            background: #0891b2;
+            border-color: #06b6d4;
+            color: #ffffff;
+        }
+        .btn-warning:hover {
+            background: #0e7490;
+            border-color: #0891b2;
+        }
+        .alert-item {
+            border: 1px solid #3f3f46;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background-color: #18181b;
+            color: #d4d4d8;
+            position: relative;
+        }
+        .alert-ajuda {
+            border-left: 4px solid #10b981;
+        }
+        .alert-acidente {
+            border-left: 4px solid #ef4444;
+        }
+        .alert-resolvido {
+            border-color: #27272a;
+            background-color: #18181b;
+            opacity: 0.6;
+        }
+
+        .alert-pending {
+            margin-top: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #a1a1aa;
+            font-size: 0.875rem;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            border: 1px solid #27272a;
+            background-color: #0f0f0f;
+            color: #d4d4d8;
+            transition: border-color 0.2s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3f3f46;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            color: #d4d4d8;
+            font-size: 0.875rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #27272a;
+        }
+        .table th {
+            background-color: #0f0f0f;
+            font-weight: 500;
+            color: #a1a1aa;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #71717a;
+            font-size: 0.875rem;
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            background-color: #064e3b;
+            color: #d1fae5;
+            border: 1px solid #065f46;
+            border-radius: 100%;
+            padding: 11px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .refresh-btn:hover {
+            background-color: #065f46;
+            border-color: #047857;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            background: #18181b;
+            margin: 10% auto;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #27272a;
+            width: 90%;
+            max-width: 400px;
+            color: #d4d4d8;
+        }
+        .close {
+            color: #71717a;
+            float: right;
+            font-size: 20px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #a1a1aa;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>IFPB - Painel Administrativo - Botão de Pânico/Auxílio</h1>
+    </div>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="card">
+                <h2>Estatísticas</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number stat-total" id="totalAlertas">0</div>
+                        <div>Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number stat-ajuda" id="totalAjuda">0</div>
+                        <div>Ajuda</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number stat-acidente" id="totalAcidente">0</div>
+                        <div>Acidentes</div>
+                    </div>
+                </div>
+            
+                <div class="alertas-bloco">
+                    <h3>Alertas Ativos por Bloco</h3>
+                    <table class="alertas-bloco-table">
+                      <thead>
+                        <tr>
+                          <th>Bloco</th>
+                          <th>Quantidade</th>
+                        </tr>
+                      </thead>
+                      <tbody id="alertasPorBloco">
+                        <tr><td colspan="2" style="text-align: center; color: #71717a;">Carregando...</td></tr>
+                      </tbody>
+                    </table>
+                </div>
+            
+                <div class="last-alert">
+                    <h3>Último alerta recebido</h3>
+                    <div id="ultimoAlerta" class="ultimo-alerta">Carregando...</div>
+                </div>
+
+                <div class="alert-pending">
+                    <h3>Alerta mais antigo pendente</h3>
+                    <div id="alertaMaisAntigo" class="ultimo-alerta">Carregando...</div>
+                </div>
+            </div>
+
+            <div class="chart-column">
+                <div class="card">
+                    <h2>Distribuição de Alertas</h2>
+                    <div class="chart-container">
+                        <canvas id="alertChart" width="240" height="200"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #34d399;"></div>
+                            <span>Ajuda</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #f87171;"></div>
+                            <span>Acidentes</span>
+                        </div>
+                    </div>
+                    <div class="chart-stats">
+                        <div class="chart-stat">
+                            <div class="chart-stat-number chart-stat-ajuda" id="chartAjudaPercent">0%</div>
+                            <div>Ajuda</div>
+                        </div>
+                        <div class="chart-stat">
+                            <div class="chart-stat-number chart-stat-acidente" id="chartAcidentePercent">0%</div>
+                            <div>Acidentes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Ocorrências por Bloco</h2>
+                    <div id="barChart" class="bar-chart">
+                        <!-- Barras serão geradas dinamicamente -->
+                    </div>
+                    <div style="text-align: center; font-size: 0.75rem; color: #a1a1aa; margin-top: auto;">
+                        Total de alertas registrados por bloco
+                    </div>
+                </div>
+            </div>
+
+            <div class="forms-column">
+                <div class="card">
+                    <h2>Cadastrar Sala</h2>
+                    <div class="form-group">
+                        <label for="nomeSala">Nome da Sala:</label>
+                        <input type="text" id="nomeSala" placeholder="Ex: Sala 101">
+                    </div>
+                    <div class="form-group">
+                        <label for="blocoSala">Bloco:</label>
+                        <input type="text" id="blocoSala" placeholder="Ex: A, B, C">
+                    </div>
+                    <div class="btn-wrapper">
+                        <button class="btn btn-success" onclick="cadastrarSala()">Cadastrar Sala</button>
+                        <button class="btn btn-success" onclick="acessarHIFPB()">HIFPB</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Cadastrar Professor</h2>
+                    <div class="form-group">
+                        <label for="nomeProfessor">Nome:</label>
+                        <input type="text" id="nomeProfessor" placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="matriculaProfessor">Matrícula:</label>
+                        <input type="text" id="matriculaProfessor" placeholder="Matrícula do professor">
+                    </div>
+                    <div class="form-group">
+                        <label for="senhaProfessor">Senha:</label>
+                        <input type="password" id="senhaProfessor" placeholder="Senha">
+                    </div>
+                    <button class="btn btn-success" onclick="cadastrarProfessor()">Cadastrar Professor</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Alertas Ativos</h2>
+            <div id="alertasAtivos">
+                <div class="empty-state">Carregando alertas...</div>
+            </div>
+        </div>
+
+        <div class="card" id="history-section">
+            <h2>Histórico de Alertas</h2>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <button class="btn btn-primary" onclick="carregarHistorico()">Carregar Histórico</button>
+                <button class="btn btn-success" onclick="limparHistorico()">Limpar Visualização</button>
+            </div>
+            <div id="historicoAlertas">
+                <div class="empty-state">Clique em "Carregar Histórico" para ver todos os alertas</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="carregarAlertasAtivos()" title="Atualizar alertas">
+        ↻
+    </button>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Confirmar Ação</h3>
+            <p id="confirmMessage"></p>
+            <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
+            <button class="btn btn-primary" onclick="fecharModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let alertasAtivos = [];
+
+        // Função para mostrar alertas de feedback
+        function mostrarFeedback(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 0.75rem 1rem;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 0.875rem;
+                z-index: 1001;
+                border: 1px solid;
+                transition: opacity 0.2s ease;
+            `;
+            
+            if (type === 'success') {
+                alert.style.background = '#064e3b';
+                alert.style.color = '#d1fae5';
+                alert.style.borderColor = '#065f46';
+            } else {
+                alert.style.background = '#7f1d1d';
+                alert.style.color = '#fecaca';
+                alert.style.borderColor = '#991b1b';
+            }
+            
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(alert)) {
+                        document.body.removeChild(alert);
+                    }
+                }, 200);
+            }, 3000);
+        }
+
+        // Carregar alertas ativos
+        async function carregarAlertasAtivos() {
+            try {
+                const response = await fetch(`${API_BASE}/alertas/ativos`);
+                alertasAtivos = await response.json();
+                
+                const container = document.getElementById('alertasAtivos');
+                
+                if (alertasAtivos.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Nenhum alerta ativo no momento</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                alertasAtivos.forEach(alerta => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert-item alert-${alerta.tipo.toLowerCase()}`;
+                    
+                    const dataFormatada = new Date(alerta.dataHora).toLocaleString('pt-BR');
+                    
+                    alertDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <strong>${alerta.tipo}</strong><br>
+                                <strong>Professor:</strong> ${alerta.professor.nome}<br>
+                                <strong>Sala:</strong> ${alerta.sala.nome} - Bloco ${alerta.sala.bloco}<br>
+                                <strong>Data/Hora:</strong> ${dataFormatada}
+                            </div>
+                            <div>
+                                <button class="btn btn-success" onclick="resolverAlerta(${alerta.id})">
+                                    Resolver
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    atualizarEstatisticas();
+                    
+                    container.appendChild(alertDiv);
+                });
+                
+            } catch (error) {
+                document.getElementById('alertasAtivos').innerHTML = 
+                    '<div class="empty-state">Erro ao carregar alertas</div>';
+                mostrarFeedback('Erro ao carregar alertas: ' + error.message, 'error');
+            }
+        }
+
+        // Resolver alerta
+        async function resolverAlerta(alertaId) {
+            if (!confirm('Tem certeza que deseja resolver este alerta?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/alertas/${alertaId}/resolver`, {
+                    method: 'PUT'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao resolver alerta');
+                }
+
+                mostrarFeedback('Alerta resolvido com sucesso!');
+                carregarAlertasAtivos();
+                atualizarEstatisticas();
+
+            } catch (error) {
+                mostrarFeedback('Erro ao resolver alerta: ' + error.message, 'error');
+            }
+        }
+
+        // Cadastrar sala
+        async function cadastrarSala() {
+            const nome = document.getElementById('nomeSala').value.trim();
+            const bloco = document.getElementById('blocoSala').value.trim();
+
+            if (!nome || !bloco) {
+                mostrarFeedback('Por favor, preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/salas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nome, bloco })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao cadastrar sala');
+                }
+
+                mostrarFeedback('Sala cadastrada com sucesso!');
+                document.getElementById('nomeSala').value = '';
+                document.getElementById('blocoSala').value = '';
+
+            } catch (error) {
+                mostrarFeedback('Erro ao cadastrar sala: ' + error.message, 'error');
+            }
+        }
+
+        // Cadastrar professor
+        async function cadastrarProfessor() {
+            const nome = document.getElementById('nomeProfessor').value.trim();
+            const matricula = document.getElementById('matriculaProfessor').value.trim();
+            const senha = document.getElementById('senhaProfessor').value;
+
+            if (!nome || !matricula || !senha) {
+                mostrarFeedback('Por favor, preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/professores`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nome, matricula, senha })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao cadastrar professor');
+                }
+
+                mostrarFeedback('Professor cadastrado com sucesso!');
+                document.getElementById('nomeProfessor').value = '';
+                document.getElementById('matriculaProfessor').value = '';
+                document.getElementById('senhaProfessor').value = '';
+
+            } catch (error) {
+                mostrarFeedback('Erro ao cadastrar professor: ' + error.message, 'error');
+            }
+        }
+
+        // Função para desenhar gráfico de pizza
+        function desenharGraficoPizza() {
+            const canvas = document.getElementById('alertChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Obter dados das estatísticas
+            const ajuda = parseInt(document.getElementById('totalAjuda').textContent) || 0;
+            const acidente = parseInt(document.getElementById('totalAcidente').textContent) || 0;
+            const total = ajuda + acidente;
+            
+            if (total === 0) {
+                // Desenhar estado vazio
+                ctx.fillStyle = '#71717a';
+                ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Nenhum dado disponível', canvas.width / 2, canvas.height / 2);
+                
+                document.getElementById('chartAjudaPercent').textContent = '0%';
+                document.getElementById('chartAcidentePercent').textContent = '0%';
+                return;
+            }
+            
+            // Calcular percentuais
+            const ajudaPercent = Math.round((ajuda / total) * 100);
+            const acidentePercent = Math.round((acidente / total) * 100);
+            
+            // Atualizar percentuais na UI
+            document.getElementById('chartAjudaPercent').textContent = ajudaPercent + '%';
+            document.getElementById('chartAcidentePercent').textContent = acidentePercent + '%';
+            
+            // Configurações do gráfico
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 70;
+            
+            // Calcular ângulos
+            const ajudaAngle = (ajuda / total) * 2 * Math.PI;
+            const acidenteAngle = (acidente / total) * 2 * Math.PI;
+            
+            let currentAngle = -Math.PI / 2; // Começar no topo
+            
+            // Desenhar fatia de Ajuda
+            if (ajuda > 0) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + ajudaAngle);
+                ctx.closePath();
+                ctx.fillStyle = '#34d399';
+                ctx.fill();
+                currentAngle += ajudaAngle;
+            }
+            
+            // Desenhar fatia de Acidentes
+            if (acidente > 0) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + acidenteAngle);
+                ctx.closePath();
+                ctx.fillStyle = '#f87171';
+                ctx.fill();
+            }
+            
+            // Desenhar borda do gráfico
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#27272a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Função para desenhar gráfico de barras por bloco
+        function desenharGraficoBarras(alertasPorBloco) {
+            const container = document.getElementById('barChart');
+            container.innerHTML = '';
+            
+            const blocos = ['A', 'B', 'C', 'D', 'E'];
+            const valores = blocos.map(bloco => alertasPorBloco[bloco] || 0);
+            const maxValor = Math.max(...valores, 1);
+            
+            blocos.forEach((bloco, index) => {
+                const valor = valores[index];
+                const altura = (valor / maxValor) * 120 + 3; // altura mínima de 3px
+                
+                const barWrapper = document.createElement('div');
+                barWrapper.style.position = 'relative';
+                barWrapper.style.display = 'flex';
+                barWrapper.style.alignItems = 'end';
+                barWrapper.style.height = '150px';
+                
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = altura + 'px';
+                
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = bloco;
+                
+                const valueLabel = document.createElement('div');
+                valueLabel.className = 'bar-value';
+                valueLabel.textContent = valor;
+                
+                bar.appendChild(label);
+                bar.appendChild(valueLabel);
+                barWrapper.appendChild(bar);
+                container.appendChild(barWrapper);
+            });
+        }
+
+        // Atualizar estatísticas
+        async function atualizarEstatisticas() {
+            try {
+                const response = await fetch(`${API_BASE}/alertas`);
+                const todoAlertas = await response.json();
+
+                // Totais atuais
+                const total = todoAlertas.length;
+                const ajuda = todoAlertas.filter(a => a.tipo === 'AJUDA').length;
+                const acidente = todoAlertas.filter(a => a.tipo === 'ACIDENTE').length;
+
+                document.getElementById('totalAlertas').textContent = total;
+                document.getElementById('totalAjuda').textContent = ajuda;
+                document.getElementById('totalAcidente').textContent = acidente;
+
+                // Desenhar gráfico de pizza
+                desenharGraficoPizza();
+
+                // --- Alertas ativos por bloco (tabela) ---
+                const alertasAtivos = todoAlertas.filter(a => a.ativo);
+                const alertasAtivosPorBloco = {};
+                alertasAtivos.forEach(alerta => {
+                    const bloco = alerta.sala?.bloco || 'Desconhecido';
+                    alertasAtivosPorBloco[bloco] = (alertasAtivosPorBloco[bloco] || 0) + 1;
+                });
+
+                const blocosAlvo = ['A', 'B', 'C', 'D', 'E'];
+                const tbodyPorBloco = document.getElementById('alertasPorBloco');
+                tbodyPorBloco.innerHTML = '';
+
+                blocosAlvo.forEach(bloco => {
+                    const count = alertasAtivosPorBloco[bloco] || 0;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>Bloco ${bloco}</td>
+                        <td>${count}</td>
+                    `;
+                    tbodyPorBloco.appendChild(tr);
+                });
+
+                // --- Gráfico de barras com todos os alertas por bloco ---
+                const todoAlertasPorBloco = {};
+                todoAlertas.forEach(alerta => {
+                    const bloco = alerta.sala?.bloco || 'Desconhecido';
+                    todoAlertasPorBloco[bloco] = (todoAlertasPorBloco[bloco] || 0) + 1;
+                });
+                
+                desenharGraficoBarras(todoAlertasPorBloco);
+
+                // --- Último alerta recebido ---
+                if (todoAlertas.length === 0) {
+                    document.getElementById('ultimoAlerta').textContent = 'Nenhum alerta recebido ainda.';
+                } else {
+                    const ultimo = todoAlertas
+                        .slice()
+                        .sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora))[0];
+
+                    const horario = new Date(ultimo.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    const tipo = ultimo.tipo.toUpperCase();
+                    const sala = ultimo.sala.nome;
+                    const bloco = ultimo.sala.bloco;
+
+                    const icone = tipo === 'AJUDA' ? '🟢' : tipo === 'ACIDENTE' ? '🔴' : '';
+
+                    document.getElementById('ultimoAlerta').textContent = `${icone} ${horario} - ${tipo.charAt(0) + tipo.slice(1).toLowerCase()} - ${sala} - Bloco ${bloco}`;
+                }
+
+                // --- Alerta mais antigo pendente ---
+                if (alertasAtivos.length === 0) {
+                    document.getElementById('alertaMaisAntigo').textContent = 'Nenhum alerta pendente no momento.';
+                } else {
+                    const maisAntigo = alertasAtivos
+                        .slice()
+                        .sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora))[0];
+
+                    const horario = new Date(maisAntigo.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    const tipo = maisAntigo.tipo.toUpperCase();
+                    const sala = maisAntigo.sala.nome;
+                    const bloco = maisAntigo.sala.bloco;
+
+                    // Calcular tempo pendente
+                    const agora = new Date();
+                    const dataAlerta = new Date(maisAntigo.dataHora);
+                    const diffMinutos = Math.floor((agora - dataAlerta) / (1000 * 60));
+                    
+                    let tempoPendente = '';
+                    if (diffMinutos < 60) {
+                        tempoPendente = `${diffMinutos}min`;
+                    } else {
+                        const horas = Math.floor(diffMinutos / 60);
+                        const mins = diffMinutos % 60;
+                        tempoPendente = mins > 0 ? `${horas}h ${mins}min` : `${horas}h`;
+                    }
+
+                    const icone = tipo === 'AJUDA' ? '🟡' : tipo === 'ACIDENTE' ? '🔴' : '';
+
+                    document.getElementById('alertaMaisAntigo').textContent = `${icone} ${horario} - ${tipo.charAt(0) + tipo.slice(1).toLowerCase()} - ${sala} - Bloco ${bloco} (${tempoPendente} pendente)`;
+                }
+
+            } catch (error) {
+                mostrarFeedback('Erro ao carregar estatísticas: ' + error.message, 'error');
+            }
+        }
+
+        // Carregar histórico
+        async function carregarHistorico() {
+            try {
+                const response = await fetch(`${API_BASE}/alertas`);
+                const todoAlertas = await response.json();
+
+                const container = document.getElementById('historicoAlertas');
+
+                if (todoAlertas.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Nenhum alerta registrado</div>';
+                    return;
+                }
+
+                // Ordenar por data (mais recente primeiro)
+                todoAlertas.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+
+                let tableHTML = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Professor</th>
+                                <th>Sala</th>
+                                <th>Data/Hora</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                todoAlertas.forEach(alerta => {
+                    const statusIcon = alerta.ativo ? 'Ativo' : 'Resolvido';
+                    const dataFormatada = new Date(alerta.dataHora).toLocaleString('pt-BR');
+
+                    tableHTML += `
+                        <tr>
+                            <td>${alerta.tipo}</td>
+                            <td>${alerta.professor.nome}</td>
+                            <td>${alerta.sala.nome} - Bloco ${alerta.sala.bloco}</td>
+                            <td>${dataFormatada}</td>
+                            <td>${statusIcon}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += '</tbody></table>';
+                container.innerHTML = tableHTML;
+
+            } catch (error) {
+                document.getElementById('historicoAlertas').innerHTML = 
+                    '<div class="empty-state">Erro ao carregar histórico</div>';
+                mostrarFeedback('Erro ao carregar histórico: ' + error.message, 'error');
+            }
+        }
+
+        // Limpar histórico (apenas visual)
+        function limparHistorico() {
+            document.getElementById('historicoAlertas').innerHTML = 
+                '<div class="empty-state">Clique em "Carregar Histórico" para ver todos os alertas</div>';
+        }
+
+        function acessarHIFPB() {
+            window.open("https://horarios.ifpb.edu.br/campina/", "_blank");
+        }
+
+        // Auto-refresh dos alertas ativos a cada 1 segundo
+        setInterval(carregarAlertasAtivos, 1000);
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarAlertasAtivos();
+            atualizarEstatisticas();
+            
+            // Redesenhar gráficos quando a janela redimensionar
+            window.addEventListener('resize', () => {
+                setTimeout(() => {
+                    desenharGraficoPizza();
+                    atualizarEstatisticas(); // para redesenhar as barras também
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
